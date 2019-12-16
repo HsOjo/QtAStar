@@ -54,11 +54,14 @@ class Map:
 
     @staticmethod
     def distance(p1, p2):
+        """计算两点间距离"""
         [x1, y1] = p1
         [x2, y2] = p2
         return math.sqrt(pow(abs(x1 - x2), 2) + pow(abs(y1 - y2), 2))
 
     def find_path(self, sp, ep, is_eight):
+        """AStar 寻路算法完整实现"""
+
         p_open = []
         p_closed = []
         p_info = {}
