@@ -18,6 +18,7 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.current_pos = None
         self.eight = False
         self.prev_path = None
+        self.moving = False
 
         self.le_width.setText('16')
         self.le_height.setText('12')
@@ -48,9 +49,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 item = self.gl_map.itemAtPosition(n, m)  # type:QWidgetItem
                 if item is not None:
                     widget = item.widget()
-                    self.gl_map.removeItem(item)
-                    widget.close()
+                    widget.hide()
                     widget.deleteLater()
+                    self.gl_map.removeItem(item)
 
     def print_map(self):
         print('=' * (self.map.w * 3))
@@ -69,6 +70,9 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.update_box(x, y)
 
     def callback_map_clicked(self, x, y):
+        if self.moving:
+            return
+
         # 地图盒子被点击事件
         if self.map[x, y] == 1:
             if self.current_pos is None:
@@ -81,6 +85,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
 
                 path = self.map.find_path(self.current_pos, (x, y), self.eight)
                 if path:
+                    self.moving = True
+
                     for p in path:
                         self.update_box(*p, 3)
                     self.events['process_events']()
@@ -95,6 +101,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     for p in path[0:-1]:
                         self.update_box(*p, 1)
                     self.current_pos = path[-1]
+
+                    self.moving = False
                 else:
                     QMessageBox.information(self, 'Error', '那里 (%d, %d) 去不了喔！' % (x, y))
 
@@ -110,8 +118,8 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         new_widget = self.generate_box(stat)
         if item is not None:
             old_widget = item.widget()
+            old_widget.hide()
             self.gl_map.replaceWidget(old_widget, new_widget)
-            old_widget.close()
             old_widget.deleteLater()
         else:
             self.gl_map.addWidget(new_widget, y, x)
