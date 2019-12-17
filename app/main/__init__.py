@@ -17,7 +17,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.speed = 0.1
         self.current_pos = None
         self.eight = False
-        self.prev_path = None
         self.moving = False
 
         self.le_width.setText('16')
@@ -79,10 +78,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                 self.current_pos = (x, y)
                 self.update_box(x, y, 2)
             else:
-                if self.prev_path is not None:
-                    for px, py in self.prev_path:
-                        self.update_box(px, py)
-
                 path = self.map.find_path(self.current_pos, (x, y), self.eight)
                 if path:
                     self.moving = True
@@ -105,8 +100,6 @@ class MainWindow(Ui_MainWindow, QMainWindow):
                     self.moving = False
                 else:
                     QMessageBox.information(self, 'Error', '那里 (%d, %d) 去不了喔！' % (x, y))
-
-                self.prev_path = path
 
     def update_box(self, x, y, stat=None):
         # 更新盒子状态
